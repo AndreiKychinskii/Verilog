@@ -1,10 +1,4 @@
 // Code your design here
-
-// module mux(input a, input b, input select, output mux_o);
-// //logic a_mux, b_mux, select_mux, mux_o_mux;
-//   assign mux_o = (select == 0) ? a : b;
-// endmodule
-
 module element_or(input a, input b, output out);
   assign out = a | b;
 endmodule

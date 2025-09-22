@@ -1,5 +1,9 @@
 // Code your testbench here
 // or browse Examples
+`define HIGH_LEVEL 1
+`define LOW_LEVEL 0
+`define NUMBER_OF_STATES_TO_TEST 8
+
 module top;
 	logic enable_i;
 	logic clk_i;
@@ -21,51 +25,18 @@ module top;
 	element_and el_and(.a(d_ff_2_out), .b(not_out), .out(enable_o));
 
 	initial begin
-	    enable_i = 1;
+	    enable_i = `HIGH_LEVEL;
         #80;
-        enable_i = 0;
+        enable_i = `LOW_LEVEL;
 	end
 
 	initial begin
-		// case 001
-		ov_fault_i = 1;
-		uv_fault_i = 0;
-		oc_fault_i = 0;
-		#10;
-		// case 010
-		ov_fault_i = 0;
-		uv_fault_i = 1;
-		oc_fault_i = 0;
-		#10;
-		// case 011
-		ov_fault_i = 1;
-		uv_fault_i = 1;
-		oc_fault_i = 0;
-		#10;
-		// case 100
-		ov_fault_i = 0;
-		uv_fault_i = 0;
-		oc_fault_i = 1;
-		#10;
-		// case 101
-		ov_fault_i = 1;
-		uv_fault_i = 0;
-		oc_fault_i = 1;
-		#10;
-		// case 110
-		ov_fault_i = 0;
-		uv_fault_i = 1;
-		oc_fault_i = 1;
-		#10;
-		// case 111
-		ov_fault_i = 1;
-		uv_fault_i = 1;
-		oc_fault_i = 1;
-		#10;
-		// case 000
-		ov_fault_i = 0;
-		uv_fault_i = 0;
-		oc_fault_i = 0;
+		for (logic [3:0] fault_states = 0; fault_states < `NUMBER_OF_STATES_TO_TEST; fault_states++) begin
+			ov_fault_i <= fault_states[0];
+			uv_fault_i <= fault_states[1];
+			oc_fault_i <= fault_states[2];
+			#20;
+		end
 	end
 
 	initial begin
@@ -78,7 +49,7 @@ module top;
 	initial begin
 		$dumpfile("wave1.vcd");
 		$dumpvars(0);
-		#100;
+		#150;
 		$finish();
 	end
 

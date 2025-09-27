@@ -4,7 +4,7 @@
 `define LOW_LEVEL 0
 `define NUMBER_OF_STATES_TO_TEST 8
 
-module top;
+module enable_module;
 	logic enable_i;
 	logic clk_i;
 	logic d_ff_1_out;

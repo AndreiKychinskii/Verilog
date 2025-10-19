@@ -13,9 +13,9 @@ endfunction
 
 // Generate Pulse Task Part
 task generate_pulse (input int delay_before_rising_edge,
-                   input int pulse_duration,
-                   input int repeat_counter,
-                   output logic signal);
+                     input int pulse_duration,
+                     input int repeat_counter,
+                     output logic signal);
   int delay_b4_rising_edge;
   int duration;
   int num_of_pulses;
@@ -23,7 +23,7 @@ task generate_pulse (input int delay_before_rising_edge,
   num_of_pulses = repeat_counter;
 
   while (num_of_pulses > 0) begin
-      delay_b4_rising_edge = delay_before_rising_edge;
+    delay_b4_rising_edge = delay_before_rising_edge;
     while (delay_b4_rising_edge > 1) begin
           @(posedge home_work_1.clk);
           signal = 1'b0;

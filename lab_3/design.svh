@@ -56,8 +56,8 @@ task recreate_object(Sensor s);
 	$display(" [Without ref] After recreate: %s", s.name);
 endtask
 
-// task recreate_object_ref(ref Sensor s);
-// 	$display("	[With ref] Before recreate: %s", s.name);
-// 	s = new("Ref Sensor", 0.9);
-// 	$display("	[With ref] After recreate: %s", s.name);
-// endtask
+task automatic recreate_object_ref(ref Sensor s);
+	$display("	[With ref] Before recreate: %s", s.name);
+	s = new("Ref Sensor", 0.9);
+ 	$display("	[With ref] After recreate: %s", s.name);
+endtask

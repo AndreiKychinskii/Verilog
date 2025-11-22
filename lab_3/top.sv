@@ -1,4 +1,6 @@
-module home_work_3;
+`include "design.svh"
+
+module top;
 	// handles creation
 	Sensor s1, s2, s3, s4, s5;
 	Sensor temp, pressure;
@@ -35,9 +37,9 @@ module home_work_3;
 		$display("Before call (no ref): %s", s3.name);
 		recreate_object(s3);
 		$display("After call (no ref): %s", s3.name);
-		// $display("Before call (ref): %s", s3.name);
-		// recreate_object_ref(s3);
-		// $display("After call (ref): %s", s3.name);
+		$display("Before call (ref): %s", s3.name);
+		recreate_object_ref(s3);
+		$display("After call (ref): %s", s3.name);
 		s3 = null;
 	end
 

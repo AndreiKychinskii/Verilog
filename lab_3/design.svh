@@ -50,12 +50,14 @@ function Sensor Sensor::copy();
 	copy.alert = this.alert;
 endfunction : copy
 
+// this is static task by default
 task recreate_object(Sensor s);
 	$display("	[Without ref] Before recreate: %s", s.name);
 	s = new("Without Ref Sensor", 0.7);
 	$display(" [Without ref] After recreate: %s", s.name);
 endtask
 
+// this is automatic task
 task automatic recreate_object_ref(ref Sensor s);
 	$display("	[With ref] Before recreate: %s", s.name);
 	s = new("Ref Sensor", 0.9);

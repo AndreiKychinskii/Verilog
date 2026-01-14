@@ -1,6 +1,6 @@
 module home_work_4;
   histogram_if histogram_if_tb();
-  // distribution_model dm;
+  distribution_model dm;
   cmd tst_cmd;
   data_packet tst_data_packet;
   data_packet_queue tst_data_packet_queue;
@@ -12,29 +12,29 @@ module home_work_4;
         histogram_if_tb.clk = 1; #(clk_period / 2); histogram_if_tb.clk = 0; #(clk_period / 2);
       end
 
-  // initial begin
-	// dm = new(histogram_if_tb);
-	// repeat (10_000) begin
-	// 	randomize_rand_values(dm);
-	// end
-	// visualize_hist(dm, dm.stats_rand);
-	// visualize_hist(dm, dm.stats_randc);
-	// visualize_hist(dm, dm.stats_dist);
+  initial begin
+	dm = new(histogram_if_tb);
+	repeat (10_000) begin
+		randomize_rand_values(dm);
+	end
+	visualize_hist(dm, dm.stats_rand);
+	visualize_hist(dm, dm.stats_randc);
+	visualize_hist(dm, dm.stats_dist);
 
-	// repeat (100_000) begin
-	// 	randomize_rand_values(dm);
-	// end
-	// visualize_hist(dm, dm.stats_rand);
-	// visualize_hist(dm, dm.stats_randc);
-	// visualize_hist(dm, dm.stats_dist);
-  // end
+	repeat (100_000) begin
+		randomize_rand_values(dm);
+	end
+	visualize_hist(dm, dm.stats_rand);
+	visualize_hist(dm, dm.stats_randc);
+	visualize_hist(dm, dm.stats_dist);
+  end
 
-  // initial begin
-  //   tst_cmd = new();
-  //   repeat (20) begin
-  //     execute_randomized_cmd(tst_cmd);
-  //   end
-  // end
+  initial begin
+    tst_cmd = new();
+    repeat (20) begin
+      execute_randomized_cmd(tst_cmd);
+    end
+  end
 
   initial begin
     // no id constraints in data_packet
@@ -68,7 +68,7 @@ module home_work_4;
   initial begin
     $dumpfile("wave1.vcd");
     $dumpvars(0);  // Dump everything in this module
-    #1000;  // adjust as needed
+    #30_000;  // adjust as needed
     $finish();
   end
 

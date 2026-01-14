@@ -46,6 +46,7 @@ class data_packet_queue;
 					data_packets[i].id != data_packets[j].id;
 	}
 
+	// random solver never constructs objects
 	function new();
 		// data_packets = new[MAX_PACKETS];
 		data_packets = new[6];
@@ -61,7 +62,7 @@ endclass : data_packet_queue
 
 typedef enum logic [2:0] {
 	ADD = 0,
-	SUB = 1,  // ??? constrants
+	SUB = 1,
 	AND = 2,
 	XOR = 3,
 	MUL = 4,
@@ -78,6 +79,10 @@ class cmd;
 	constraint c_opcode_e {
 		opcode_e inside {[0:5]};
 	};
+
+	constraint c_sub_args {
+		(opcode_e == SUB) -> op_a >= op_b;
+	}
 
 	constraint c1_latency_in_ns {
 		(opcode_e == ADD) -> latency_in_ns inside {[1:10]};
@@ -113,8 +118,7 @@ task automatic execute_randomized_cmd(ref cmd ptr_cmd);
 		string op_code_like_str;
 		if (!ptr_cmd.randomize()) begin
 			$display("ERROR: FAIL of randomization is detected!");
-			$finish();
-			// disable;
+			return;
 		end
 		start_time = $realtime;
 		#(ptr_cmd.latency_in_ns);
@@ -177,7 +181,7 @@ class distribution_model;
 	constraint c_rand_value_with_distribution {
 		// rand_value_with_distribution >= 1;
 		// rand_value_with_distribution <= 100;
-		rand_value_with_distribution dist { [45:54] := 10, [1:44] :/ 45, [55:100] :/ 45};  // ????
+		rand_value_with_distribution dist { [45:54] := 10, [1:44] :/ 45, [55:100] :/ 45};
 	};
 endclass : distribution_model
 
@@ -219,11 +223,9 @@ endtask
 
 task automatic visualize_hist(ref distribution_model ptr_dm, int unsigned stats_rand[int unsigned]);
 	int unsigned key_idx = 1;
-	// $display("Pause is started");
     repeat(100) begin
 	    @(posedge ptr_dm.hist_if.clk);
     end
-	// $display("Pause is finished");
 	repeat (100) begin
 		@(posedge ptr_dm.hist_if.clk);
 		ptr_dm.hist_if.generated_value = key_idx;

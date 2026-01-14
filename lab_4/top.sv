@@ -1,6 +1,8 @@
+// Randomization
+
 module home_work_4;
   histogram_if histogram_if_tb();
-  distribution_model dm;
+  distribution_model tst_dist_model;
   cmd tst_cmd;
   data_packet tst_data_packet;
   data_packet_queue tst_data_packet_queue;
@@ -13,20 +15,20 @@ module home_work_4;
       end
 
   initial begin
-	dm = new(histogram_if_tb);
+	tst_dist_model = new(histogram_if_tb);
 	repeat (10_000) begin
-		randomize_rand_values(dm);
+		randomize_rand_values(tst_dist_model);
 	end
-	visualize_hist(dm, dm.stats_rand);
-	visualize_hist(dm, dm.stats_randc);
-	visualize_hist(dm, dm.stats_dist);
+	visualize_hist(tst_dist_model, tst_dist_model.stats_rand);
+	visualize_hist(tst_dist_model, tst_dist_model.stats_randc);
+	visualize_hist(tst_dist_model, tst_dist_model.stats_dist);
 
 	repeat (100_000) begin
-		randomize_rand_values(dm);
+		randomize_rand_values(tst_dist_model);
 	end
-	visualize_hist(dm, dm.stats_rand);
-	visualize_hist(dm, dm.stats_randc);
-	visualize_hist(dm, dm.stats_dist);
+	visualize_hist(tst_dist_model, tst_dist_model.stats_rand);
+	visualize_hist(tst_dist_model, tst_dist_model.stats_randc);
+	visualize_hist(tst_dist_model, tst_dist_model.stats_dist);
   end
 
   initial begin

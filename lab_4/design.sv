@@ -1,4 +1,5 @@
 // =======================================================================================================================
+// Array Randomization Part: start
 // =======================================================================================================================
 
 class data_packet;
@@ -11,29 +12,34 @@ class data_packet;
 		data[i] inside {[1:10]};
 	}
 	constraint data_elem_2 {foreach (this.data[i])
-		this.data[i] > this.data[i - 1];
+		if (i > 0)
+			this.data[i] > this.data[i - 1];
 	}
+	constraint c_id {id > 0;}
 
 	extern function void display();
 
 endclass : data_packet
 
 function void data_packet::display();
-	$display("==================================");
-	$display("packet id = %0d", this.id);
-	$display("==================================");
-	$display("data.sum() = %0d", this.data.sum());
+	string data_str;
+	$display("=========== packet ===============");
+	$display("id = %0d, len = %0d, sum = %0d", this.id, this.data.size(), this.data.sum());
 	foreach (this.data[i]) begin
-		$display("data[%0d] = %0d", i, this.data[i]);
+		if (i > 0)
+			data_str = {data_str, " "};
+		data_str = {data_str, $sformatf("%0d", this.data[i])};
 	end
+  $display("data = %s", data_str.len() ? data_str : "empty");
+	$display("==================================");
 endfunction
 
 class data_packet_queue;
-	// local parameter int MAX_PACKETS = 6;
+	localparam int MAX_PACKETS = 6;
 
 	rand data_packet data_packets[];
 
-	constraint data_packets_size {this.data_packets.size() inside {[3:6]};}
+	constraint data_packets_size {this.data_packets.size() inside {[3:MAX_PACKETS]};}
 
 	constraint data_packet_id_is_limited {foreach (data_packets[i])
 		data_packets[i].id inside {[1:20]};
@@ -48,8 +54,7 @@ class data_packet_queue;
 
 	// random solver never constructs objects
 	function new();
-		// data_packets = new[MAX_PACKETS];
-		data_packets = new[6];
+		data_packets = new[MAX_PACKETS];
 		foreach (data_packets[i]) begin
 			data_packets[i] = data_packet::new();
 		end
@@ -58,6 +63,11 @@ class data_packet_queue;
 endclass : data_packet_queue
 
 // =======================================================================================================================
+// Array Randomization Part: end
+// =======================================================================================================================
+
+// =======================================================================================================================
+// ALU Model Part: start
 // =======================================================================================================================
 
 typedef enum logic [2:0] {
@@ -97,7 +107,7 @@ class cmd;
 	};
 
 	constraint c_op_b {
-		op_b == 0 -> op_a == 0;
+      (opcode_e == DIV && op_b == 0) -> op_a == 0;
 	};
 
 	constraint c_bit_width_add {
@@ -146,6 +156,11 @@ task automatic execute_randomized_cmd(ref cmd ptr_cmd);
 endtask
 
 // =======================================================================================================================
+// ALU Model Part: end
+// =======================================================================================================================
+
+// =======================================================================================================================
+// Distribution Model Part: start
 // =======================================================================================================================
 
 interface histogram_if;
@@ -179,15 +194,11 @@ class distribution_model;
 		randc_value <= 100;
 	};
 	constraint c_rand_value_with_distribution {
-		// rand_value_with_distribution >= 1;
-		// rand_value_with_distribution <= 100;
 		rand_value_with_distribution dist { [45:54] := 10, [1:44] :/ 45, [55:100] :/ 45};
 	};
 endclass : distribution_model
 
-// =======================================================================================================================
-// =======================================================================================================================
-
+// Collects data
 task automatic collect_stats(ref distribution_model ptr_dm);
   begin
     // rand_value
@@ -211,6 +222,7 @@ task automatic collect_stats(ref distribution_model ptr_dm);
   end
 endtask
 
+// Provides randomization and data collection
 task automatic randomize_rand_values(ref distribution_model ptr_dm);
 	begin
 		if (ptr_dm.randomize()) begin
@@ -221,6 +233,7 @@ task automatic randomize_rand_values(ref distribution_model ptr_dm);
 	end
 endtask
 
+// Sends data to interface
 task automatic visualize_hist(ref distribution_model ptr_dm, int unsigned stats_rand[int unsigned]);
 	int unsigned key_idx = 1;
     repeat(100) begin
@@ -232,24 +245,11 @@ task automatic visualize_hist(ref distribution_model ptr_dm, int unsigned stats_
 		ptr_dm.hist_if.generated_cnt = stats_rand[key_idx];
 		key_idx = key_idx + 1;
 	end
+	@(posedge ptr_dm.hist_if.clk);
+	ptr_dm.hist_if.generated_value = 0;
+	ptr_dm.hist_if.generated_cnt = 0;
 endtask
 
 // =======================================================================================================================
+// Distribution Model Part: end
 // =======================================================================================================================
-
-task automatic print_rand_values (ref distribution_model ptr_dm);
-  $display("dm.rand_value = %0d", ptr_dm.rand_value);
-  $display("dm.randc_value = %0d", ptr_dm.randc_value);
-  $display("dm.rand_value_with_distribution = %0d", ptr_dm.rand_value_with_distribution);
-endtask
-
-task automatic print_stats (ref distribution_model ptr_dm);
-  $display("dm.stats_rand[%0d] = %0d", ptr_dm.rand_value, ptr_dm.stats_rand[ptr_dm.rand_value]);
-  $display("dm.stats_randc[%0d] = %0d", ptr_dm.randc_value, ptr_dm.stats_randc[ptr_dm.randc_value]);
-  $display("dm.stats_dist[%0d] = %0d", ptr_dm.rand_value_with_distribution, ptr_dm.stats_dist[ptr_dm.rand_value_with_distribution]);
-endtask
-
-task automatic print_report(ref distribution_model ptr_dm);
-	print_rand_values(ptr_dm);
-	print_stats(ptr_dm);
-endtask

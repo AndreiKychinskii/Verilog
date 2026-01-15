@@ -52,9 +52,11 @@ module home_work_4;
     repeat (3) begin
       tst_data_packet_queue = new();
       if (tst_data_packet_queue.randomize()) begin
+        $display("================ queue start ============");
         foreach (tst_data_packet_queue.data_packets[i]) begin
           tst_data_packet_queue.data_packets[i].display();
         end
+        $display("================ queue end ==============");
       end else begin
         $display("ERROR: FAIL of randomization of tst_data_packet_queue is detected!");
       end

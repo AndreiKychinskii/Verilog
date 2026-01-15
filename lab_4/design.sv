@@ -107,7 +107,7 @@ class cmd;
 	};
 
 	constraint c_op_b {
-      (opcode_e == DIV && op_b == 0) -> op_a == 0;
+      (opcode_e == DIV) -> op_b != 0;
 	};
 
 	constraint c_bit_width_add {
@@ -173,7 +173,7 @@ class distribution_model;
 	rand int unsigned rand_value;
 	randc int unsigned randc_value;
 	rand int unsigned rand_value_with_distribution;
-    int unsigned stats_rand[int unsigned];
+  int unsigned stats_rand[int unsigned];
 	int unsigned stats_randc[int unsigned];
 	int unsigned stats_dist[int unsigned];
 
@@ -194,6 +194,13 @@ class distribution_model;
 		randc_value <= 100;
 	};
 	constraint c_rand_value_with_distribution {
+		// [45:54] means 10 items, so weight is 10*10 (as value) = 100;
+		// [1:44] means 44 items, total weight is 45;
+		// [55:100] means 46 items, total weight is 45
+		// Total weights are: 100 + 45 + 45 = 190
+		// P([45:54]) = 100 / 190 = 0.526315789, approx. 52.6%
+		// P([1:44]) = 45 / 190 = 0.236842105, approx. 23.7%
+		// P([55:100]) = 45 / 190 = 0.236842105, approx. 23.7%
 		rand_value_with_distribution dist { [45:54] := 10, [1:44] :/ 45, [55:100] :/ 45};
 	};
 endclass : distribution_model
